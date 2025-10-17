@@ -1,0 +1,35 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TestTask.App"
+             xmlns:local="using:TestTask"
+             xmlns:converters="using:TestTask.Converters"
+             RequestedThemeVariant="Default">
+   <!-- "Default" ThemeVariant controls whether this is in Light, Dark, or HighContrast.
+        The default value is Light. Light. You can change this to "Dark" or "HighContrast" for a specific theme. -->
+
+   <Application.Resources>
+       <converters:IdToHeaderTextConverter x:Key="IdToHeaderTextConverter" />
+       <converters:FirstErrorMessageConverter x:Key="FirstErrorMessageConverter" />
+   </Application.Resources>
+
+   <Application.DataTemplates>
+       <local:ViewLocator/>
+   </Application.DataTemplates>
+
+    <Application.Styles>
+        <FluentTheme />
+        <!-- Style for validation errors -->
+        <Style Selector="TextBox.error /template/ Border#PART_Border">
+            <Setter Property="BorderBrush" Value="Red"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+        <Style Selector="ComboBox.error /template/ Border#PART_Border">
+            <Setter Property="BorderBrush" Value="Red"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+        <Style Selector="NumericUpDown.error /template/ Border#PART_Border">
+            <Setter Property="BorderBrush" Value="Red"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+    </Application.Styles>
+</Application>

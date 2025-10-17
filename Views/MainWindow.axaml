@@ -1,0 +1,18 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TestTask.ViewModels"
+        xmlns:views="using:TestTask.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+        x:Class="TestTask.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Управление работниками">
+
+    <Design.DataContext>
+        <vm:WorkerListViewModel />
+    </Design.DataContext>
+
+    <views:WorkerView />
+
+</Window>

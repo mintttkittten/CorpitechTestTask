@@ -1,0 +1,150 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:TestTask.ViewModels"
+             xmlns:converters="using:TestTask.Converters"
+             xmlns:systemValidation="clr-namespace:System.ComponentModel.DataAnnotations;assembly=System.ComponentModel.DataAnnotations"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+             x:Class="TestTask.Views.WorkerView"
+             x:DataType="vm:WorkerListViewModel">
+    <Design.DataContext>
+        <vm:WorkerListViewModel />
+    </Design.DataContext>
+    <UserControl.Resources>
+        <converters:RoleToRussianConverter x:Key="RoleToRussianConverter"/>
+    </UserControl.Resources>
+    <Grid RowDefinitions="Auto, *, Auto">
+        <!-- Main content area -->
+        <Panel Grid.Row="1" IsVisible="{Binding !IsEditingWorker}">
+            <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, *">
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="Список работников" FontSize="20" FontWeight="Bold" Margin="10"/>
+                <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="10">
+                    <Button Content="Экспорт в Excel" Command="{Binding ExportToExcelCommand}"/>
+                    <Button Content="Добавить нового работника" Command="{Binding AddNewWorkerCommand}"/>
+                </StackPanel>
+
+                <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Workers}"
+                                  Margin="10">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:WorkerViewModel">
+                                <Border BorderBrush="LightGray" BorderThickness="1" Margin="2" Padding="5">
+                                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="20">
+                                        <!-- Worker Details -->
+                                        <StackPanel Orientation="Horizontal" Spacing="15" Grid.Column="0" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock Text="Имя:" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock Text="Фамилия:" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Surname}"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock Text="Отчество:" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Lastname}"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock Text="Должность:" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Role, Converter={StaticResource RoleToRussianConverter}}"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock Text="Зарплата:" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Salary, StringFormat='C2'}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <!-- Action Buttons -->
+                                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Grid.Column="1" VerticalAlignment="Center">
+                                            <Button Content="Изменить" Command="{Binding $parent[UserControl].DataContext.EditWorkerCommand}"
+                                                    CommandParameter="{Binding Mode=OneWay}"/>
+                                            <Button Content="Удалить" Command="{Binding $parent[UserControl].DataContext.DeleteWorkerCommand}"
+                                                    CommandParameter="{Binding Mode=OneWay}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Panel>
+
+        <!-- Edit/Add Worker Form -->
+        <Border Grid.Row="1"
+                IsVisible="{Binding IsEditingWorker}"
+                BorderBrush="LightGray"
+                BorderThickness="1"
+                CornerRadius="5"
+                Padding="20"
+                Margin="10"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="{DynamicResource SystemChromeLowColor}">
+            <StackPanel Orientation="Vertical" Spacing="10" MaxWidth="400">
+                <TextBlock Text="{Binding WorkerToEdit.Id, Converter={StaticResource IdToHeaderTextConverter}}"
+                           FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto" RowSpacing="5" ColumnSpacing="10">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Имя:"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding WorkerToEdit.Name}" Watermark="Введите имя"
+                             Classes.error="{Binding WorkerToEdit.HasErrors, Mode=OneWay}">
+                        <ToolTip.Tip>
+                            <ToolTip IsVisible="{Binding WorkerToEdit.NameError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                     Content="{Binding WorkerToEdit.NameError}"
+                                     Foreground="Red"/>
+                        </ToolTip.Tip>
+                    </TextBox>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Фамилия:"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding WorkerToEdit.Surname}" Watermark="Введите фамилию"
+                             Classes.error="{Binding WorkerToEdit.HasErrors, Mode=OneWay}">
+                        <ToolTip.Tip>
+                            <ToolTip IsVisible="{Binding WorkerToEdit.SurnameError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                     Content="{Binding WorkerToEdit.SurnameError}"
+                                     Foreground="Red"/>
+                        </ToolTip.Tip>
+                    </TextBox>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Отчество:"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding WorkerToEdit.Lastname}" Watermark="Необязательное отчество"
+                             Classes.error="{Binding WorkerToEdit.HasErrors, Mode=OneWay}">
+                        <ToolTip.Tip>
+                            <ToolTip IsVisible="{Binding WorkerToEdit.LastnameError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                     Content="{Binding WorkerToEdit.LastnameError}"
+                                     Foreground="Red"/>
+                        </ToolTip.Tip>
+                    </TextBox>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Должность:"/>
+                    <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{x:Static vm:WorkerRoles.All}"
+                              SelectedItem="{Binding WorkerToEdit.Role}"
+                              Classes.error="{Binding WorkerToEdit.HasErrors, Mode=OneWay}">
+                        <ToolTip.Tip>
+                            <!-- Role doesn't have a direct [Required] attribute, but other validations could set errors -->
+                            <ToolTip IsVisible="{Binding WorkerToEdit.RoleError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                     Content="{Binding WorkerToEdit.RoleError}"
+                                     Foreground="Red"/>
+                        </ToolTip.Tip>
+                    </ComboBox>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Зарплата:"/>
+                    <NumericUpDown Grid.Row="4" Grid.Column="1" Value="{Binding WorkerToEdit.Salary}" Minimum="0.01" FormatString="C2"
+                                   Classes.error="{Binding WorkerToEdit.HasErrors, Mode=OneWay}">
+                        <ToolTip.Tip>
+                            <ToolTip IsVisible="{Binding WorkerToEdit.SalaryError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                     Content="{Binding WorkerToEdit.SalaryError}"
+                                     Foreground="Red"/>
+                        </ToolTip.Tip>
+                    </NumericUpDown>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,10,0,0">
+                    <Button Content="Сохранить" Command="{Binding SaveWorkerCommand}" IsEnabled="{Binding !WorkerToEdit.HasErrors}" Classes="accent"/>
+                    <Button Content="Отмена" Command="{Binding CancelEditCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
